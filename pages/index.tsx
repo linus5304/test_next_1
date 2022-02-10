@@ -1,6 +1,7 @@
 import type { NextPage } from "next"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ListItem } from "../components/ListItem"
+import { Pagination } from "../components/Pagination"
 import { SearchComponent } from "../components/SearchComponent"
 import { ListData } from "../interface/listdata"
 
@@ -57,13 +58,20 @@ const Home: NextPage = () => {
     },
   ]
 
-  const [data, setData] = useState<ListData[]>(items)
-  const [itemsPerPage, setItemsPerPage] = useState<number>(5)
+  const [data, setData] = useState<ListData[]>([])
+  const [itemsPerPage, setItemsPerPage] = useState<number>(3)
   const [currentPage, setCurrentPage] = useState<number>(1)
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentItems = items.slice(indexOfFirstItem, indexOfLastItem)
+
+  useEffect(() => {
+    setData(currentItems)
+  }, [currentPage])
+
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
 
   function handleChange(text: string) {
     if (text !== "") {
@@ -86,7 +94,10 @@ const Home: NextPage = () => {
       </div>
 
       {/* search bar with icons */}
-      <SearchComponent handleChange={handleChange} />
+      <div className="flex justify-center space-x-4 items-center">
+        <SearchComponent handleChange={handleChange} />
+        <Pagination totalItems={items.length} itemsPerPage={itemsPerPage} currentPage={currentPage} paginate={paginate}/>
+      </div>
 
       <div>
         <ListItem data={data} />
